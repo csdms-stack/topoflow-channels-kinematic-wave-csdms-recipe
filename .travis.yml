@@ -1,0 +1,26 @@
+language: generic
+os:
+- linux
+- osx
+env:
+  global:
+  - THIS_PACKAGE="csdms-topoflow-channels-kinematic-wave"
+  - TRAVIS_PYTHON_VERSION="2.7"
+  - NUMPY_VERSION="1.9"
+  - secure: gGx1QOHBPy2pu3GfxuS6L0QfwmamgDqNYbFUi+SpphGWL09ZEZpCpvIfSxyeBiQL7An4ksVFR5Mo0ZqNkFLcJN09JIHIG2z3YF3GfwtIp1PyiRPTmU0GvG8xEAoyzS2AVLMONDpjZVJUl0a4LVdMKXGNOUL3LKiTNCL4KfRkK18o76yY/8Arc5cYWDjoud+Sg8iHKUMWdoXzXIWePnOHWjpsr9DQ3nijDbtROYCRP7nhrt4KMTokyJg5Gt4mOhSZis71PJrgleWX4HpG4hjbYAiTGJp0OP8VWKP9OJ1Etmi+wQ5Z8o9CID06Ul84pDV27KGeuk7Eet10Qub3qi/G9e6fp28U3OMRVafet76D+FwNEaj2uEMjGtIuDBIz+vK00nlrb3Bk45u7FKjXPocgvaWxKX5CfPu2Y6r13wLHJ4Hb9PO/y3r1ctJ/xkPwYIf8OgqCEv/AENvhn2EAjV3CUT2WTV2qbQGDRTaUTBnvldnPP47IdE2zulDzapWlju8j9J9sgHoVQAzhoL5YaGc3PXNhesdeITlpXG9y3ORMlMLJtS7eJS4dsQHleOtXOmkmgqnaOc+9kfT4lt/6XPYZl2zyixsR1Pz+xWp5IOzI0t3cyyz4x241IiLbaFgLYHFBT39Jq3KpGcakuQ7HaAzfoWwu/sLZFutW2X2QXFup0nM=
+sudo: false
+before_install:
+- |
+  if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+    brew remove --force $(brew list)
+    brew cleanup -s
+    rm -rf $(brew --cache)
+  fi
+install:
+- bash ci/travis/install_python.sh $HOME/miniconda
+- export PATH="$HOME/miniconda/bin:$PATH"
+script:
+- conda build recipe -c conda-forge -c csdms-stack
+after_success:
+- if [[ $TRAVIS_BRANCH == "master" ]]; then export CHANNEL="main"; fi
+- bash ci/travis/deploy_to_anaconda.sh $THIS_PACKAGE
